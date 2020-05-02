@@ -20,15 +20,18 @@ import javax.servlet.http.HttpSession;
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final String LOGIN_QUERY = "SELECT COUNT(*) FROM ADMIN WHERE USERNAME=? AND PASSWORD=? ";
+	Connection con = null;
+	ResultSet rs = null;
+	PreparedStatement ps = null;
+	RequestDispatcher rd = null;
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		System.out.println("LoginServlet.doGet()");
 		PrintWriter out = response.getWriter();
 		response.setContentType("text/html");
-		Connection con = null;
-		ResultSet rs = null;
+		RequestDispatcher rd = null;
+
 		int count = 0;
-		PreparedStatement ps = null;
 
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
@@ -52,43 +55,44 @@ public class LoginServlet extends HttpServlet {
 				} // if
 			} // if
 			if (count == 0) {
-				out.println("<h1 style='color:red';text-align:'center'>Login failed<h1>");
+				out.println("<h5 style='color:red';text-align:'center'>Login Failed<h5>");
+				rd = request.getRequestDispatcher("/index.html");
+				rd.include(request, response);
 			} else {
 				out.println("<h1 style='color:green';text-align:'center'>Login success</h1>");
 
 			}
 
 		} // try
-		catch (SQLException se) {
-			se.printStackTrace();
-		} catch (ClassNotFoundException cnf) {
-			cnf.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (con != null)
-					con.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
-			}
-			try {
-				if (ps != null)
-					ps.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
-			}
-			try {
-				if (rs != null)
-					rs.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
-			}
-
+		catch (Exception e) {
+			 rd = request.getRequestDispatcher("/errorurl");
+			 rd.forward(request, response);
 		}
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
+	}
+
+	public void destroy() {
+		try {
+			if (con != null)
+				con.close();
+		} catch (SQLException se) {
+			se.printStackTrace();
+		}
+		try {
+			if (ps != null)
+				ps.close();
+		} catch (SQLException se) {
+			se.printStackTrace();
+		}
+		try {
+			if (rs != null)
+				rs.close();
+		} catch (SQLException se) {
+			se.printStackTrace();
+		}
+
 	}
 }

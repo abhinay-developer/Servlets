@@ -16,6 +16,7 @@ public class ErrorServlet extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		PrintWriter pw = null;
+		pw=response.getWriter();
 		response.setContentType("text/html");
 		pw.println("<h1 style='color:red'>Internal problem try again!</h1>");
 	}
